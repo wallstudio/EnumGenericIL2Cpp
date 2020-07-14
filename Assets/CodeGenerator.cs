@@ -26,6 +26,8 @@ public class Hoge
 #elif ENUM
     public string Name = ""_ENUM"";
 %D_FOR%    public Dictionary<Example%D_NUMBER%, string> m_table%D_NUMBER% = new Dictionary<Example%D_NUMBER%, string>(){ [Example%D_NUMBER%.VALUE_1] = ""Piyo"" };
+#else
+    public string Name = ""_NONE"";
 #endif
     
     public (int dicCount, int enumCount, string define) Count()
@@ -46,8 +48,8 @@ public class Hoge
 %D_FOR%        dics.Add(m_table%D_NUMBER%[Example%D_NUMBER%.VALUE_1]);
         #endregion
 #endif
-
-        return (dics.Count, enums.Count, dics.FirstOrDefault() == ""Piyo"" ? $""{Name}_"" : ""_NONE_"");
+        Debug.Log(dics.FirstOrDefault());
+        return (dics.Count, enums.Count, $""{Name}_"");
     }
 }
 
