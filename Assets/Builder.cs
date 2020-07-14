@@ -29,8 +29,8 @@ public static class Builder
             foreach (var def in new[]{"NONW", "INT", "ENUM"})
             {
                 const string AVERAGE_LOG = "Build/mean_log.txt";
-                var max = 262144; // 2^18
-                for (int i = 64; i <= max; i *= i) // 12 times
+                var max = 16384; // 2^14
+                for (int i = 64; i <= max; i *= 2) // 8 times
                 {
                     var (time, size) = Build(targ, tar, def, max, i, 5);
                     string line = $"{i}, {def}, {tar}, {i}, {max}, {time:F0}, {size}";
@@ -48,13 +48,12 @@ public static class Builder
         {
             PlayerSettings.SetScriptingDefineSymbolsForGroup(g, def);
         }
-
-        EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
-
         var span = new List<double>();
         var size = new List<long>();
         for (int i = 0; i < iter; i++) // mean
         {
+            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
+
             Stopwatch sw = new Stopwatch();
             sw.Start();
             CodeGenerator.CodeGen(enumCount, dicCount);
