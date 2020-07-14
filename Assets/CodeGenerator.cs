@@ -96,6 +96,8 @@ public class Hoge
         }
 
         File.WriteAllLines("Assets/Generated.cs", lines);
+        AssetImporter.GetAtPath("Assets/Generated.cs").SaveAndReimport();
+        AssetDatabase.Refresh();
     }
 }
 

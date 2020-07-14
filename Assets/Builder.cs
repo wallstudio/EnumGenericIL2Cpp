@@ -21,62 +21,93 @@ public static class Builder
     // [MenuItem("Build/NONE")]
     // static void BuildNone() => Build("NONE", 100, 100);
 
+    const string CMD_LIST = "commnad.csv";
+
     [MenuItem("Build/ALL")]
     static void BuildAll()
     {
+        var commands = new List<string>();
         foreach (var (targ, tar) in new[]{(BuildTargetGroup.iOS, BuildTarget.iOS), (BuildTargetGroup.Android, BuildTarget.Android)})
         {
-            foreach (var def in new[]{"NONE", "INT", "ENUM"})
+            foreach (var def in new[]{ "INT", "ENUM"})
             {
-                const string AVERAGE_LOG = "Build/mean_log.txt";
                 var max = 16384; // 2^14
                 for (int i = 64; i <= max; i *= 2) // 8 times
                 {
-                    var (time, size) = Build(targ, tar, def, max, i, 5);
-                    string line = $"{i}, {def}, {tar}, {i}, {max}, {time:F0}, {size}";
-                    File.AppendAllLines(AVERAGE_LOG, new []{ line });
+                    var command = string.Join(",", new object[]{true, targ, tar, def, max, i, 5}.Select(o => o.ToString()));
+                    commands.Add(command);
                 }
-                File.AppendAllLines(AVERAGE_LOG, new []{""});
             }
         }
+        File.WriteAllLines(CMD_LIST, commands);
+        Build();
     }
     
-    
-    static (double, long) Build(BuildTargetGroup targ, BuildTarget tar, string def, int enumCount = 100, int dicCount = 100, int iter = 3)
+    [InitializeOnLoadMethod]
+    static void Build()
     {
-        foreach (var g in new[]{BuildTargetGroup.Android, BuildTargetGroup.iOS})
+        // args
+        if(!File.Exists(CMD_LIST)) return;
+        var commands = File.ReadAllLines(CMD_LIST);
+        if(commands.Length == 0) return;
+        var args = commands.FirstOrDefault().Split(',');
+        if(args.Length < 7) return;
+        if(!bool.TryParse(args[0], out var isPrepare)) return;
+        if(!Enum.TryParse<BuildTargetGroup>(args[1], out var targ)) return;
+        if(!Enum.TryParse<BuildTarget>(args[2], out var tar)) return;
+        string def = args[3];
+        if(!int.TryParse(args[4], out var enumCount)) return;
+        if(!int.TryParse(args[5], out var dicCount)) return;
+        if(!int.TryParse(args[6], out var iter)) return;
+
+        if(isPrepare)
         {
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(g, def);
-        }
-        var span = new List<double>();
-        var size = new List<long>();
-        for (int i = 0; i < iter; i++) // mean
-        {
-            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
+            var newCommand = string.Join(",", new object[]{false, targ, tar, def, enumCount, dicCount, iter}.Select(o => o.ToString()));
+            File.WriteAllLines(CMD_LIST, new []{newCommand}.Concat(commands.Skip(1)));
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            CodeGenerator.CodeGen(enumCount, dicCount);
-            AssetDatabase.Refresh();
-            var hoge = new Hoge().Count();
-            UnityEngine.Debug.Log(hoge);
-            
-            string path = $"Build/Build_{i}_{def}_{tar}_{dicCount}_{enumCount}";
-            var e = BuildPipeline.BuildPlayer(new []{new EditorBuildSettingsScene("Assets/SampleScene.unity", true)}, path, tar, BuildOptions.None);
-            span.Add(sw.Elapsed.TotalMilliseconds);
-            size.Add(GetDirectorySize(path));
-
-            string line = $"{i}, {hoge.define}, {tar}, {hoge.dicCount}, {hoge.enumCount}, {sw.Elapsed.TotalMilliseconds:F0}, {GetDirectorySize(path)}";
-            File.AppendAllLines("Build/log.txt", new []{line});
-
-            if(e.summary.result != BuildResult.Succeeded)
+            foreach (var g in new[]{BuildTargetGroup.Android, BuildTargetGroup.iOS})
             {
-                throw new Exception();
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(g, def);
             }
-            Thread.Sleep(500);
+            CodeGenerator.CodeGen(enumCount, dicCount);
+            AssetDatabase.Refresh(); // Build();
+            return;
         }
+        else
+        {
+            var span = new List<double>();
+            var size = new List<long>();
+            for (int i = 0; i < iter; i++) // mean
+            {
+                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
 
-        return (span.Average(), (long)size.Average());
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                var hoge = new Hoge().Count();
+                UnityEngine.Debug.Log(hoge);
+                
+                string path = $"Build/Build_{i}_{def}_{tar}_{dicCount}_{enumCount}";
+                var e = BuildPipeline.BuildPlayer(new []{new EditorBuildSettingsScene("Assets/SampleScene.unity", true)}, path, tar, BuildOptions.None);
+                span.Add(sw.Elapsed.TotalMilliseconds);
+                size.Add(GetDirectorySize(path));
+
+                string line = $"{i}, {hoge.define}, {tar}, {hoge.dicCount}, {hoge.enumCount}, {sw.Elapsed.TotalMilliseconds:F0}, {GetDirectorySize(path)}";
+                File.AppendAllLines("Build/log.csv", new []{line});
+
+                if(e.summary.result != BuildResult.Succeeded)
+                {
+                    File.WriteAllText(CMD_LIST, "");
+                    throw new Exception();
+                }
+                UnityEngine.Debug.Log((span.Average(), (long)size.Average()));
+
+                File.WriteAllLines(CMD_LIST, commands.Skip(1));
+            }
+
+            Thread.Sleep(500);
+            Build();
+            return;
+        }
     }
 
     static long GetDirectorySize(string path)
