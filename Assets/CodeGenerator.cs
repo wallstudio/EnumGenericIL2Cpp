@@ -21,10 +21,10 @@ using System.Linq;
 public class Hoge
 {
 #if INT
-    public string Name = ""INT"";
+    public string Name = ""_INT"";
 %D_FOR%    public Dictionary<int, string> m_table%D_NUMBER% = new Dictionary<int, string>(){ [(int)Example%D_NUMBER%.VALUE_1] = ""Piyo"" };
 #elif ENUM
-    public string Name = ""ENUM"";
+    public string Name = ""_ENUM"";
 %D_FOR%    public Dictionary<Example%D_NUMBER%, string> m_table%D_NUMBER% = new Dictionary<Example%D_NUMBER%, string>(){ [Example%D_NUMBER%.VALUE_1] = ""Piyo"" };
 #endif
     
@@ -47,7 +47,7 @@ public class Hoge
         #endregion
 #endif
 
-        return (dics.Count, enums.Count, dics.FirstOrDefault() ?? ""NONE"");
+        return (dics.Count, enums.Count, dics.FirstOrDefault() ?? ""_NONE"");
     }
 }
 

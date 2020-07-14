@@ -26,7 +26,7 @@ public static class Builder
     {
         foreach (var (targ, tar) in new[]{(BuildTargetGroup.iOS, BuildTarget.iOS), (BuildTargetGroup.Android, BuildTarget.Android)})
         {
-            foreach (var def in new[]{"NONW", "INT", "ENUM"})
+            foreach (var def in new[]{"NONE", "INT", "ENUM"})
             {
                 const string AVERAGE_LOG = "Build/mean_log.txt";
                 var max = 16384; // 2^14
@@ -61,12 +61,12 @@ public static class Builder
             var hoge = new Hoge().Count();
             UnityEngine.Debug.Log(hoge);
             
-            string path = $"Build/Build_{i}_{hoge.define}_{tar}_{hoge.dicCount}_{hoge.enumCount}";
+            string path = $"Build/Build_{i}_{def}_{tar}_{dicCount}_{enumCount}";
             var e = BuildPipeline.BuildPlayer(new []{new EditorBuildSettingsScene("Assets/SampleScene.unity", true)}, path, tar, BuildOptions.None);
             span.Add(sw.Elapsed.TotalMilliseconds);
             size.Add(GetDirectorySize(path));
 
-            string line = $"{i}, {def}, {tar}, {dicCount}, {enumCount}, {sw.Elapsed.TotalMilliseconds:F0}, {GetDirectorySize(path)}";
+            string line = $"{i}, {hoge.define}, {tar}, {hoge.dicCount}, {hoge.enumCount}, {sw.Elapsed.TotalMilliseconds:F0}, {GetDirectorySize(path)}";
             File.AppendAllLines("Build/log.txt", new []{line});
 
             if(e.summary.result != BuildResult.Succeeded)
