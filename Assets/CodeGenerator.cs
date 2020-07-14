@@ -47,7 +47,7 @@ public class Hoge
         #endregion
 #endif
 
-        return (dics.Count, enums.Count, dics.FirstOrDefault() ?? ""_NONE"");
+        return (dics.Count, enums.Count, dics.FirstOrDefault() == ""Piyo"" ? $""{Name}_"" : ""_NONE_"");
     }
 }
 

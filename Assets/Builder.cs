@@ -29,7 +29,7 @@ public static class Builder
         var commands = new List<string>();
         foreach (var (targ, tar) in new[]{(BuildTargetGroup.iOS, BuildTarget.iOS), (BuildTargetGroup.Android, BuildTarget.Android)})
         {
-            foreach (var def in new[]{ "INT", "ENUM"})
+            foreach (var def in new[]{ "NONE", "INT", "ENUM"})
             {
                 var max = 16384; // 2^14
                 for (int i = 64; i <= max; i *= 2) // 8 times
@@ -60,54 +60,66 @@ public static class Builder
         if(!int.TryParse(args[5], out var dicCount)) return;
         if(!int.TryParse(args[6], out var iter)) return;
 
-        if(isPrepare)
+        var called = false;
+        var current = DateTime.Now;
+        UnityEngine.Debug.Log($"Delay 10s");
+        EditorApplication.update += () => 
         {
-            var newCommand = string.Join(",", new object[]{false, targ, tar, def, enumCount, dicCount, iter}.Select(o => o.ToString()));
-            File.WriteAllLines(CMD_LIST, new []{newCommand}.Concat(commands.Skip(1)));
+            if(called) return;
+            if((DateTime.Now - current).TotalSeconds < 10) return;
+            called = true;
+            
 
-            foreach (var g in new[]{BuildTargetGroup.Android, BuildTargetGroup.iOS})
+            if(isPrepare)
             {
-                PlayerSettings.SetScriptingDefineSymbolsForGroup(g, def);
-            }
-            CodeGenerator.CodeGen(enumCount, dicCount);
-            AssetDatabase.Refresh(); // Build();
-            return;
-        }
-        else
-        {
-            var span = new List<double>();
-            var size = new List<long>();
-            for (int i = 0; i < iter; i++) // mean
-            {
-                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
+                var newCommand = string.Join(",", new object[]{false, targ, tar, def, enumCount, dicCount, iter}.Select(o => o.ToString()));
+                File.WriteAllLines(CMD_LIST, new []{newCommand}.Concat(commands.Skip(1)));
 
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-                var hoge = new Hoge().Count();
-                UnityEngine.Debug.Log(hoge);
-                
-                string path = $"Build/Build_{i}_{def}_{tar}_{dicCount}_{enumCount}";
-                var e = BuildPipeline.BuildPlayer(new []{new EditorBuildSettingsScene("Assets/SampleScene.unity", true)}, path, tar, BuildOptions.None);
-                span.Add(sw.Elapsed.TotalMilliseconds);
-                size.Add(GetDirectorySize(path));
-
-                string line = $"{i}, {hoge.define}, {tar}, {hoge.dicCount}, {hoge.enumCount}, {sw.Elapsed.TotalMilliseconds:F0}, {GetDirectorySize(path)}";
-                File.AppendAllLines("Build/log.csv", new []{line});
-
-                if(e.summary.result != BuildResult.Succeeded)
+                foreach (var g in new[]{BuildTargetGroup.Android, BuildTargetGroup.iOS})
                 {
-                    File.WriteAllText(CMD_LIST, "");
-                    throw new Exception();
+                    PlayerSettings.SetScriptingDefineSymbolsForGroup(g, def);
                 }
-                UnityEngine.Debug.Log((span.Average(), (long)size.Average()));
-
-                File.WriteAllLines(CMD_LIST, commands.Skip(1));
+                CodeGenerator.CodeGen(enumCount, dicCount);
+                AssetDatabase.Refresh(); // Build();
+                return;
             }
+            else
+            {
+                var span = new List<double>();
+                var size = new List<long>();
+                for (int i = 0; i < iter; i++) // mean
+                {
+                    EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
 
-            Thread.Sleep(500);
-            Build();
-            return;
-        }
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
+                    var hoge = new Hoge().Count();
+                    UnityEngine.Debug.Log(hoge);
+                    
+                    string path = $"Build/Build_{i}_{def}_{tar}_{dicCount}_{enumCount}";
+                    var scenes = new []{new EditorBuildSettingsScene("Assets/SampleScene.unity", true)};
+                    var e = BuildPipeline.BuildPlayer(scenes, path, tar, BuildOptions.None);
+                    span.Add(sw.Elapsed.TotalMilliseconds);
+                    size.Add(GetDirectorySize(path));
+
+                    string line = $"{i}, {hoge.define}, {tar}, {hoge.dicCount}, {hoge.enumCount}, {sw.Elapsed.TotalMilliseconds:F0}, {GetDirectorySize(path)}";
+                    File.AppendAllLines("Build/log.csv", new []{line});
+
+                    if(e.summary.result != BuildResult.Succeeded)
+                    {
+                        File.WriteAllText(CMD_LIST, "");
+                        throw new Exception();
+                    }
+                    UnityEngine.Debug.Log((span.Average(), (long)size.Average()));
+
+                    File.WriteAllLines(CMD_LIST, commands.Skip(1));
+                }
+
+                Thread.Sleep(500);
+                Build();
+                return;
+            }
+        };
     }
 
     static long GetDirectorySize(string path)
