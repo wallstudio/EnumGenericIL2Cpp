@@ -218,6 +218,7 @@ namespace SPACE_3
 
     public class Hoge
     {
+        public string Name { get { hoge(); return "INT"; } }
         public Dictionary<int, string> m_table0 = new Dictionary<int, string>(){ [(int)Example0.VALUE_1] = "Piyo" };
         public Dictionary<int, string> m_table1 = new Dictionary<int, string>(){ [(int)Example1.VALUE_1] = "Piyo" };
         public Dictionary<int, string> m_table2 = new Dictionary<int, string>(){ [(int)Example2.VALUE_1] = "Piyo" };
@@ -635,6 +636,7 @@ namespace SPACE_3
 
     public class Hoge
     {
+        public string Name { get { hoge(); return "ENUM"; } }
         public Dictionary<Example0, string> m_table0 = new Dictionary<Example0, string>(){ [Example0.VALUE_1] = "Piyo" };
         public Dictionary<Example1, string> m_table1 = new Dictionary<Example1, string>(){ [Example1.VALUE_1] = "Piyo" };
         public Dictionary<Example2, string> m_table2 = new Dictionary<Example2, string>(){ [Example2.VALUE_1] = "Piyo" };

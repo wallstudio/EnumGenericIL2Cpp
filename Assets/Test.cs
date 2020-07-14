@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Linq;
+using UnityEngine.UI;
 
 #if UNITY_EDITOR
 
@@ -87,16 +88,16 @@ public class Test : MonoBehaviour
     void Start()
     {
         #if ENUM || INT
-        new SPACE_0.Hoge().hoge();
-        new SPACE_1.Hoge().hoge();
-        new SPACE_2.Hoge().hoge();
-        new SPACE_3.Hoge().hoge();
-        new SPACE_4.Hoge().hoge();
-        new SPACE_5.Hoge().hoge();
-        new SPACE_6.Hoge().hoge();
-        new SPACE_7.Hoge().hoge();
-        new SPACE_8.Hoge().hoge();
-        new SPACE_9.Hoge().hoge();
+        GetComponent<Text>().text += new SPACE_0.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_1.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_2.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_3.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_4.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_5.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_6.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_7.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_8.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_9.Hoge().Name + "\n";
         #endif
     }
 
