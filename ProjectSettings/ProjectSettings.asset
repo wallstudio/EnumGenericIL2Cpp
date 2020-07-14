@@ -675,8 +675,8 @@ PlayerSettings:
   webGLWasmStreaming: 0
   scriptingDefineSymbols:
     1: NONE
-    4: ENUM
-    7: NONE
+    4: INT
+    7: INT
     13: NONE
     14: NONE
     19: NONE
@@ -687,6 +687,7 @@ PlayerSettings:
     29: NONE
   platformArchitecture: {}
   scriptingBackend:
+    Android: 1
     Standalone: 1
   il2cppCompilerConfiguration: {}
   managedStrippingLevel: {}
