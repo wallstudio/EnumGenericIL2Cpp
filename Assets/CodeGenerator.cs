@@ -28,7 +28,7 @@ public class Hoge
 %D_FOR%    public Dictionary<Example%D_NUMBER%, string> m_table%D_NUMBER% = new Dictionary<Example%D_NUMBER%, string>(){ [Example%D_NUMBER%.VALUE_1] = ""Piyo"" };
 #endif
     
-    public (int, int, string) Count()
+    public (int dicCount, int enumCount, string define) Count()
     {
         #region enum count
         var enums = new List<int>();

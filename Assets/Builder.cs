@@ -58,9 +58,10 @@ public static class Builder
             sw.Start();
             CodeGenerator.CodeGen(enumCount, dicCount);
             AssetDatabase.Refresh();
-            UnityEngine.Debug.Log(new Hoge().Count());
+            var hoge = new Hoge().Count();
+            UnityEngine.Debug.Log(hoge);
             
-            string path = $"Build/Build_{i}_{def}_{tar}_{dicCount}_{enumCount}";
+            string path = $"Build/Build_{i}_{hoge.define}_{tar}_{hoge.dicCount}_{hoge.enumCount}";
             var e = BuildPipeline.BuildPlayer(new []{new EditorBuildSettingsScene("Assets/SampleScene.unity", true)}, path, tar, BuildOptions.None);
             span.Add(sw.Elapsed.TotalMilliseconds);
             size.Add(GetDirectorySize(path));
