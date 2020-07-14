@@ -98,6 +98,16 @@ public class Test : MonoBehaviour
         GetComponent<Text>().text += new SPACE_7.Hoge().Name + "\n";
         GetComponent<Text>().text += new SPACE_8.Hoge().Name + "\n";
         GetComponent<Text>().text += new SPACE_9.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_10.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_11.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_12.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_13.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_14.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_15.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_16.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_17.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_18.Hoge().Name + "\n";
+        GetComponent<Text>().text += new SPACE_19.Hoge().Name + "\n";
         #endif
     }
 

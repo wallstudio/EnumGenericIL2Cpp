@@ -675,7 +675,7 @@ PlayerSettings:
   webGLWasmStreaming: 0
   scriptingDefineSymbols:
     1: NONE
-    4: NONE
+    4: ENUM
     7: NONE
     13: NONE
     14: NONE
